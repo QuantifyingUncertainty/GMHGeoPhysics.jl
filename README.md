@@ -18,4 +18,4 @@ Each folder is structered in a similar way:
 - **data**: files containing measurement data
 - **notebooks**: documented examples for MCMC experiments, to be used in an IJulia notebook server
 - **scripts**: documented examples for MCMC experiments that can be run from a Julia command-line (REPL) session
-- **analysis**: functionality to analyse the results of GMH runs
+- **analysis**: functionality to analyse the results of MCMC experiments
