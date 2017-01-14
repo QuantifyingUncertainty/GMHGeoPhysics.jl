@@ -45,3 +45,9 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Directories created on JuliaBox or Evoqus
+.evoqusignore
+location/notebooks/.ipynb_checkpoints
+focal/notebooks/.ipynb_checkpoints
+finitefault/notebooks/.ipynb_checkpoints
