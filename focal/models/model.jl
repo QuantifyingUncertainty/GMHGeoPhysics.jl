@@ -34,29 +34,29 @@ function readsac(fstream)
                "kt5","kt6","kt7","kt8","kt9","kf","kuser0","kuser1","kuser2",
                "kcmpnm","knetwk","kdatrd","kinst"]
 
-    # Read in header information
+    ###Read in header information
     floatData = read(fstream, Float32, 70)
     intData = read(fstream, Int32, 40)
     charData = read(fstream, UInt8, 192)
 
-    # Build dictionaries and merge
+    ###Build dictionaries and merge
     d = Dict{Any, Any}()
-    fd = [ floatKey[i] => floatData[i] for i = 1:length(floatKey) ]
-    id = [ intKey[i] => intData[i] for i = 1:length(intKey) ]
+    fd = Dict(floatKey[i] => floatData[i] for i = 1:length(floatKey))
+    id = Dict(intKey[i] => intData[i] for i = 1:length(intKey))
     j = 1
     for i = 1:length(charKey)
         if i == 2
-            d[ charKey[i] ] = ascii(charData[j : j + 15])
+            d[ charKey[i] ] = ascii(String(charData[j : j + 15]))
             j += 16
         else
-            d[ charKey[i] ] = ascii(charData[j : j + 7])
+            d[ charKey[i] ] = ascii(String(charData[j : j + 7]))
             j += 8
         end
     end
 
     d = merge(fd, id, d)
 
-    # Extract number of points in data array
+    ###Extract number of points in data array
     npts = intData[10]
     data = read(fstream, Float32, npts)
     return d, data
@@ -109,94 +109,85 @@ function trapezoid(dura::Float64, rise::Float64, dt::Float64)
     return src
 end
 
-# green func 0
-fgrn0 = "50.grn.0"
-fsgrn0 = open(fgrn0)
-hdgrn0, grn0 = readsac(fsgrn0)
-close(fsgrn0)
-# green func 1
-fgrn1 = "50.grn.1"
-fsgrn1 = open(fgrn1)
-hdgrn1, grn1 = readsac(fsgrn1)
-close(fsgrn1)
-# green func 2
-fgrn2 = "50.grn.2"
-fsgrn2 = open(fgrn2)
-hdgrn2, grn2 = readsac(fsgrn2)
-close(fsgrn2)
-# green func 3
-fgrn3 = "50.grn.3"
-fsgrn3 = open(fgrn3)
-hdgrn3, grn3 = readsac(fsgrn3)
-close(fsgrn3)
-# green func 4
-fgrn4 = "50.grn.4"
-fsgrn4 = open(fgrn4)
-hdgrn4, grn4 = readsac(fsgrn4)
-close(fsgrn4)
-# green func 5
-fgrn5 = "50.grn.5"
-fsgrn5 = open(fgrn5)
-hdgrn5, grn5 = readsac(fsgrn5)
-close(fsgrn5)
-# green func 6
-fgrn6 = "50.grn.6"
-fsgrn6 = open(fgrn6)
-hdgrn6, grn6 = readsac(fsgrn6)
-close(fsgrn6)
-# green func 7
-fgrn7 = "50.grn.7"
-fsgrn7 = open(fgrn7)
-hdgrn7, grn7 = readsac(fsgrn7)
-close(fsgrn7)
-# green func 8
-fgrn8 = "50.grn.8"
-fsgrn8 = open(fgrn8)
-hdgrn8, grn8 = readsac(fsgrn8)
-close(fsgrn8)
+function synwv(paras::Vector, num_rcv::Int64, rcv_dist::Vector, rcv_azim::Vector, src_mag::Float64, src_dura::Float64, src_rise::Float64, delta::Float64)
+    # source parameters
+    strike = paras[1]
+    dip = paras[2]
+    rake = paras[3]
+    apt1 = []
+    apt2 = []
+    apt3 = []
 
-# source parameters 
-strike = 155.0
-dip = 82.0
-rake = 172.0
-azimuth = 226.8
-rad =  dc_radiat(azimuth-strike, dip, rake)
-#println(rad[1,1])
-#println(rad[1,2])
-#println(rad[1,3])
-#println(rad[2,1])
-#println(rad[2,2])
-#println(rad[2,3])
-#println(rad[3,1])
-#println(rad[3,2])
-#println(rad[3,3])
+    for i=1:1:num_rcv
+        # green func 0
+        fgrn0 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.0"
+        fsgrn0 = open(fgrn0)
+        hdgrn0, grn0 = readsac(fsgrn0)
+        close(fsgrn0)
+        # green func 1
+        fgrn1 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.1"
+        fsgrn1 = open(fgrn1)
+        hdgrn1, grn1 = readsac(fsgrn1)
+        close(fsgrn1)
+        # green func 2
+        fgrn2 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.2"
+        fsgrn2 = open(fgrn2)
+        hdgrn2, grn2 = readsac(fsgrn2)
+        close(fsgrn2)
+        # green func 3
+        fgrn3 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.3"
+        fsgrn3 = open(fgrn3)
+        hdgrn3, grn3 = readsac(fsgrn3)
+        close(fsgrn3)
+        # green func 4
+        fgrn4 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.4"
+        fsgrn4 = open(fgrn4)
+        hdgrn4, grn4 = readsac(fsgrn4)
+        close(fsgrn4)
+        # green func 5
+        fgrn5 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.5"
+        fsgrn5 = open(fgrn5)
+        hdgrn5, grn5 = readsac(fsgrn5)
+        close(fsgrn5)
+        # green func 6
+        fgrn6 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.6"
+        fsgrn6 = open(fgrn6)
+        hdgrn6, grn6 = readsac(fsgrn6)
+        close(fsgrn6)
+        # green func 7
+        fgrn7 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.7"
+        fsgrn7 = open(fgrn7)
+        hdgrn7, grn7 = readsac(fsgrn7)
+        close(fsgrn7)
+        # green func 8
+        fgrn8 = "/home/eamon/software/GMHGeoPhysics.jl/focal/models/greens/$(rcv_dist[i]).grn.8"
+        fsgrn8 = open(fgrn8)
+        hdgrn8, grn8 = readsac(fsgrn8)
+        close(fsgrn8)
 
-m0 = 6.0
-m0 = 10.0^(1.5*m0+16.1-20.0)
-dura = 2.0
-rise = 0.2
-dt = 0.1
-src = trapezoid(dura, rise, dt)
-ns = round(Int64, dura/dt)
-#for i=1:1:ns+1
-#    println(src[i])
-#end
-
-npt = convert(Int64, hdgrn0["npts"])
-syn = zeros(Float64, 3, npt)
-
-for k = 1:1:hdgrn0["npts"]
-    syn[1,k] = m0 * (rad[1,1]*grn0[k] + rad[2,1]*grn3[k] + rad[3,1]*grn6[k])
-    syn[2,k] = m0 * (rad[1,2]*grn1[k] + rad[2,2]*grn4[k] + rad[3,2]*grn7[k])
-    syn[3,k] = m0 * (rad[1,3]*grn2[k] + rad[2,3]*grn5[k] + rad[3,3]*grn8[k])
-end
-
-pt1 = conv(src, ns, syn[1,:], npt)
-pt2 = conv(src, ns, syn[2,:], npt)
-pt3 = conv(src, ns, syn[3,:], npt)
-
-for i=1:1:npt
-    #println(syn[3,i])
-    #println(pt3[i])
-    println(pt1[i], " ", pt2[i], " ", pt3[i])
+        azimuth = rcv_azim[i]
+        rad =  dc_radiat(azimuth-strike, dip, rake)
+        #println(rad[1,1],",",rad[1,2],",",rad[1,3],",",rad[2,1],",",rad[2,2],",",rad[2,3],",",rad[3,1],",",rad[3,2],",",rad[3,3])
+        m0 = 10.0^(1.5*src_mag+16.1-20.0)
+        dura = src_dura # 1.0
+        rise = src_rise # 0.5
+        dt = delta # 0.1
+        src = trapezoid(dura, rise, dt)
+        ns = round(Int64, dura/dt)
+        npt = convert(Int64, hdgrn0["npts"])
+        syn = zeros(Float64, 3, npt)
+        for k = 1:1:npt
+            syn[1,k] = m0 * (rad[1,1]*grn0[k] + rad[2,1]*grn3[k] + rad[3,1]*grn6[k])
+            syn[2,k] = m0 * (rad[1,2]*grn1[k] + rad[2,2]*grn4[k] + rad[3,2]*grn7[k])
+            syn[3,k] = m0 * (rad[1,3]*grn2[k] + rad[2,3]*grn5[k] + rad[3,3]*grn8[k])
+        end
+        pt1 = conv(src, ns, syn[1,:], npt)
+        pt2 = conv(src, ns, syn[2,:], npt)
+        pt3 = conv(src, ns, syn[3,:], npt)
+        push!(apt1, pt1)
+        push!(apt2, pt2)
+        push!(apt3, pt3)
+    end
+    apt = cat(2, apt1, apt2, apt3)
+    return apt
 end
