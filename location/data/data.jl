@@ -1,9 +1,10 @@
-@everywhere using GeneralizedMetropolisHastings
-@everywhere using Geodesy
+using GeneralizedMetropolisHastings
+using Geodesy
 using PyPlot
 
 ###Include the model functions
 include("../models/model.jl")
+include("../models/dataparameters.jl")
 
 ###Source location(latitude, longitude and depth)
 src_loc = [27.809, 86.066, 10.0]

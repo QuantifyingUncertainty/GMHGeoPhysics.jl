@@ -59,6 +59,7 @@ function readsac(fstream)
     ###Extract number of points in data array
     npts = intData[10]
     data = read(fstream, Float32, npts)
+    ###println(size(data))
     return d, data
 
 end
@@ -174,7 +175,7 @@ function synwv(paras::Vector, num_rcv::Int64, rcv_dist::Vector, rcv_azim::Vector
         dt = delta # 0.1
         src = trapezoid(dura, rise, dt)
         ns = round(Int64, dura/dt)
-        npt = convert(Int64, hdgrn0["npts"])
+        global npt = convert(Int64, hdgrn0["npts"])
         syn = zeros(Float64, 3, npt)
         for k = 1:1:npt
             syn[1,k] = m0 * (rad[1,1]*grn0[k] + rad[2,1]*grn3[k] + rad[3,1]*grn6[k])
@@ -184,10 +185,15 @@ function synwv(paras::Vector, num_rcv::Int64, rcv_dist::Vector, rcv_azim::Vector
         pt1 = conv(src, ns, syn[1,:], npt)
         pt2 = conv(src, ns, syn[2,:], npt)
         pt3 = conv(src, ns, syn[3,:], npt)
-        push!(apt1, pt1)
-        push!(apt2, pt2)
-        push!(apt3, pt3)
+        append!(apt1, pt1)
+        append!(apt2, pt2)
+        append!(apt3, pt3)
     end
+    apt1 = reshape(apt1, npt, num_rcv)
+    apt2 = reshape(apt2, npt, num_rcv)
+    apt3 = reshape(apt3, npt, num_rcv)
     apt = cat(2, apt1, apt2, apt3)
+    ###append!(apt1, apt2)
+    ###append!(apt1, apt3)
     return apt
 end
